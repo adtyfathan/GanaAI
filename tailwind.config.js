@@ -13,6 +13,9 @@ export default {
     theme: {
         extend: {
             fontFamily: {
+                jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
+                dm: ['"DM Sans"', 'sans-serif'],
+                mono: ['"JetBrains Mono"', 'monospace'],
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
         },

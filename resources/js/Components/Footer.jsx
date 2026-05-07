@@ -12,7 +12,7 @@ export default function Footer() {
                     {/* Brand Section */}
                     <div className="md:col-span-1">
                         <div className="flex items-center mb-4">
-                            <img src="/logo.png" alt="" className="h-10 w-auto" />
+                            <img src="/images/logo.png" alt="" className="h-10 w-auto" />
                             <span className="text-2xl font-bold text-orange-500 -ml-3">Gana</span>
                             <span className="text-2xl font-bold text-gray-600">AI</span>
                         </div>

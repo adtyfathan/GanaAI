@@ -26,7 +26,7 @@ export default function Navbar({ auth }) {
                     <div className="flex h-full items-center justify-between">
                     <div className="flex-shrink-0">
                         <Link href="/" className="flex items-center hover:opacity-80 transition">
-                            <img src="/logo.png" alt="" className="h-10 w-auto" />
+                            <img src="/images/logo.png" alt="" className="h-10 w-auto" />
                             <span className="text-2xl font-bold text-orange-500 -ml-3">Gana</span>
                             <span className="text-2xl font-bold text-gray-500">AI</span>
                         </Link>
