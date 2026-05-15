@@ -33,4 +33,12 @@ class BusinessProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the products for this business.
+     */
+    public function products(): HasMany
+    {
+        return $this->user->products();
+    }
 }

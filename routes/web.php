@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -14,9 +15,32 @@ Route::get('/', function () {
     ]);
 });
 
+// Onboarding routes (after signup)
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Business profile setup
+    Route::get('/onboarding/bisnis', [OnboardingController::class, 'showBusinessForm'])
+        ->name('onboarding.business.form');
+    Route::post('/onboarding/bisnis', [OnboardingController::class, 'storeBusinessProfile'])
+        ->name('onboarding.business.store');
+
+    // Product setup
+    Route::get('/onboarding/produk', [OnboardingController::class, 'showProductForm'])
+        ->name('onboarding.product.form');
+    Route::post('/onboarding/produk', [OnboardingController::class, 'storeProduct'])
+        ->name('onboarding.product.store');
+    Route::patch('/onboarding/produk/{product}', [OnboardingController::class, 'updateProduct'])
+        ->name('onboarding.product.update');
+    Route::delete('/onboarding/produk/{product}', [OnboardingController::class, 'deleteProduct'])
+        ->name('onboarding.product.delete');
+
+    // Complete onboarding
+    Route::post('/onboarding/selesai', [OnboardingController::class, 'completeOnboarding'])
+        ->name('onboarding.complete');
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'onboarding.complete'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
