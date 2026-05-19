@@ -2,9 +2,9 @@ import { Link } from '@inertiajs/react';
 
 export default function Footer() {
     return (
-        <footer className="relative bg-gradient-to-br from-gray-50 via-white to-gray-50 text-gray-700 py-16 border-t border-gray-200">
+        <footer className="relative bg-linear-to-br from-gray-50 via-white to-gray-50 text-gray-700 py-16 border-t border-gray-200">
             {/* Decorative gradient blur */}
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/3 via-transparent to-blue-500/3 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-linear-to-r from-orange-500/3 via-transparent to-blue-500/3 pointer-events-none"></div>
             
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 {/* Main Content Grid */}

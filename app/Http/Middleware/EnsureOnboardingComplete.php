@@ -16,7 +16,7 @@ class EnsureOnboardingComplete
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user() && !$request->user()->hasCompletedOnboarding()) {
-            return redirect()->route('onboarding.business.form');
+            return redirect()->route('onboarding.form');
         }
 
         return $next($request);

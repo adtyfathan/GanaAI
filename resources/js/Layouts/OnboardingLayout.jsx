@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { Toaster } from "@/components/ui/sonner";
 
 export default function OnboardingLayout({ children, title, step = 1, totalSteps = 2 }) {
     return (
@@ -23,16 +24,8 @@ export default function OnboardingLayout({ children, title, step = 1, totalSteps
             {/* Main Content */}
             <main className="flex-1">
                 {children}
+                <Toaster variant="success" position="bottom-right" richColors />
             </main>
-
-            {/* Footer */}
-            <footer className="border-t border-gray-200 bg-gray-50 py-8 mt-16">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <p className="text-sm text-gray-600">
-                        © 2026 GanaAI. Automasi konten sosial media untuk UMKM Indonesia.
-                    </p>
-                </div>
-            </footer>
         </div>
     );
 }

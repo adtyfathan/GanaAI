@@ -6,21 +6,28 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProductRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
-     */
     public function rules(): array
     {
+        $isUpdate = $this->routeIs('onboarding.product.update');
+
+        if ($isUpdate) {
+            return [
+                'name' => 'required|string|max:150',
+                'product_type' => 'required|string|in:physical,digital,service,subscription',
+                'description' => 'required|string|max:500',
+                'price' => 'required|numeric|min:0|max:999999999.99',
+                'kept_image_ids' => 'nullable|array',
+                'kept_image_ids.*' => 'integer',
+                'new_images' => 'nullable|array|max:5',
+                'new_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
+            ];
+        }
+
         return [
             'name' => 'required|string|max:150',
             'product_type' => 'required|string|in:physical,digital,service,subscription',
@@ -31,9 +38,6 @@ class StoreProductRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get custom messages for validator errors.
-     */
     public function messages(): array
     {
         return [
@@ -51,6 +55,10 @@ class StoreProductRequest extends FormRequest
             'images.*.image' => 'Setiap file harus berupa gambar.',
             'images.*.mimes' => 'Gambar harus berformat JPEG, PNG, atau GIF.',
             'images.*.max' => 'Ukuran setiap gambar maksimal 5MB.',
+            'new_images.max' => 'Maksimal 5 gambar produk diizinkan.',
+            'new_images.*.image' => 'Setiap file harus berupa gambar.',
+            'new_images.*.mimes' => 'Gambar harus berformat JPEG, PNG, atau GIF.',
+            'new_images.*.max' => 'Ukuran setiap gambar maksimal 5MB.',
         ];
     }
 }

@@ -13,52 +13,43 @@ use Inertia\Inertia;
 class OnboardingController extends Controller
 {
     /**
-     * Show the business profile setup form.
+     * Show the unified onboarding page (business + product in one view).
      */
-    public function showBusinessForm(Request $request)
+    public function showOnboarding(Request $request)
     {
         $user = $request->user();
 
-        // Check if user already has business profile
-        if ($user->businessProfile()->exists()) {
-            return redirect()->route('onboarding.product.form');
-        }
+        $products = $user->products()->with('images')->get();
 
-        return Inertia::render('Onboarding/BusinessSetup', [
+        return Inertia::render('Onboarding/Onboarding', [
             'businessTypes' => $this->getBusinessTypes(),
             'contentTones' => $this->getContentTones(),
-            'brandColors' => $this->getBrandColors(),
-            'locations' => $this->getLocations(), // Indonesian cities/regions
+            'locations' => $this->getLocations(),
+            'productTypes' => $this->getProductTypes(),
+            'products' => $products,
+            'productCount' => $products->count(),
+            'businessProfile' => $user->businessProfile,
         ]);
     }
 
     /**
-     * Store business profile data.
+     * Store (or update) the business profile.
+     * Returns an Inertia redirect back to the same page so the frontend
+     * receives fresh props (including the saved businessProfile).
      */
     public function storeBusinessProfile(StoreBusinessProfileRequest $request)
     {
         $user = $request->user();
-
-        // Check if business profile already exists
-        if ($user->businessProfile()->exists()) {
-            return redirect()->route('onboarding.product.form');
-        }
-
         $validated = $request->validated();
 
-        // Store logo if uploaded
-        $logoPath = null;
+        $logoPath = $user->businessProfile?->logo_path;
         if ($request->hasFile('logo')) {
             $logoPath = $request->file('logo')->store('logos', 'public');
         }
 
-        // Determine timezone from location (simple mapping, can be enhanced)
         $timezone = $this->getTimezoneFromLocation($validated['location']);
 
-        // Create business profile with dummy Zernio ID (will be set during OAuth)
-        BusinessProfile::create([
-            'user_id' => $user->id,
-            'zernio_social_set_id' => null,
+        $payload = [
             'logo_path' => $logoPath,
             'business_name' => $validated['business_name'],
             'business_type' => $validated['business_type'],
@@ -69,47 +60,37 @@ class OnboardingController extends Controller
             'content_tone' => $validated['content_tone'],
             'location' => $validated['location'],
             'timezone' => $timezone,
-        ]);
+        ];
 
-        return redirect()->route('onboarding.product.form')->with('success', 'Profil bisnis berhasil disimpan!');
+        // Upsert: create if not exists, update if already exists
+        BusinessProfile::updateOrCreate(
+            ['user_id' => $user->id],
+            $payload
+        );
+
+        // Redirect back to the same onboarding page so Inertia reloads
+        // the page props (including businessProfile) and the frontend
+        // onSuccess callback can advance to step 2.
+        return redirect()->route('onboarding.form')
+            ->with('success', 'Profil bisnis berhasil disimpan!');
     }
 
     /**
-     * Show the product setup form.
-     */
-    public function showProductForm(Request $request)
-    {
-        $user = $request->user();
-
-        // Check if user has business profile
-        if (!$user->businessProfile()->exists()) {
-            return redirect()->route('onboarding.business.form');
-        }
-
-        $products = $user->products()->with('images')->get();
-
-        return Inertia::render('Onboarding/ProductSetup', [
-            'productTypes' => $this->getProductTypes(),
-            'products' => $products,
-            'productCount' => $products->count(),
-        ]);
-    }
-
-    /**
-     * Store product data.
+     * Store a new product.
+     * Redirects back to the same onboarding page so Inertia reloads
+     * the products list in page props.
      */
     public function storeProduct(StoreProductRequest $request)
     {
         $user = $request->user();
 
-        // Check if user has business profile
+        // Guard: must have a business profile first
         if (!$user->businessProfile()->exists()) {
-            return redirect()->route('onboarding.business.form');
+            return redirect()->route('onboarding.form');
         }
 
         $validated = $request->validated();
 
-        // Create product
         $product = Product::create([
             'user_id' => $user->id,
             'name' => $validated['name'],
@@ -118,58 +99,66 @@ class OnboardingController extends Controller
             'price' => $validated['price'],
         ]);
 
-        // Store product images
         if ($request->hasFile('images')) {
             $sortOrder = 1;
             foreach ($request->file('images') as $image) {
-                $imagePath = $image->store('products', 'public');
-
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_path' => $imagePath,
+                    'image_path' => $image->store('products', 'public'),
                     'sort_order' => $sortOrder++,
                 ]);
             }
         }
 
-        return redirect()->route('dashboard')->with('success', 'Produk berhasil ditambahkan!');
+        // Redirect back to onboarding so Inertia refreshes page props
+        // (products list updates automatically via the reloaded props).
+        return redirect()->route('onboarding.form')
+            ->with('success', 'Produk berhasil ditambahkan!');
     }
 
     /**
-     * Update product data.
+     * Update an existing product.
      */
-    public function updateProduct(StoreProductRequest $request, Product $product)
+    public function updateProduct(Request $request, Product $product)
     {
         $user = $request->user();
 
-        // Check authorization
         if ($product->user_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $validated = $request->validated();
-
-        // Update product
-        $product->update([
-            'name' => $validated['name'],
-            'product_type' => $validated['product_type'],
-            'description' => $validated['description'],
-            'price' => $validated['price'],
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'product_type' => 'required|string',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'kept_image_ids' => 'nullable|array',
+            'kept_image_ids.*' => 'string|exists:product_images,id',
+            'new_images' => 'nullable|array',
+            'new_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
-        // Handle image updates if provided
-        if ($request->hasFile('images')) {
-            // Delete old images
-            $product->images()->delete();
+        $product->update([
+            'name' => $request->name,
+            'product_type' => $request->product_type,
+            'description' => $request->description,
+            'price' => $request->price,
+        ]);
 
-            // Store new images
-            $sortOrder = 1;
-            foreach ($request->file('images') as $image) {
-                $imagePath = $image->store('products', 'public');
+        // Hapus gambar yang tidak ada di kept_image_ids
+        $keptIds = $request->input('kept_image_ids', []);
+        $product->images()
+            ->when(!empty($keptIds), fn($q) => $q->whereNotIn('id', $keptIds))
+            ->when(empty($keptIds), fn($q) => $q)
+            ->delete();
 
+        // Tambah gambar baru
+        if ($request->hasFile('new_images')) {
+            $sortOrder = ($product->images()->max('sort_order') ?? 0) + 1;
+            foreach ($request->file('new_images') as $image) {
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_path' => $imagePath,
+                    'image_path' => $image->store('products', 'public'),
                     'sort_order' => $sortOrder++,
                 ]);
             }
@@ -177,27 +166,22 @@ class OnboardingController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Produk berhasil diperbarui!',
             'product' => $product->load('images'),
         ]);
     }
 
     /**
-     * Delete a product.
+     * Soft-delete a product.
      */
     public function deleteProduct(Request $request, Product $product)
     {
         $user = $request->user();
 
-        // Check authorization
         if ($product->user_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Delete product images
         $product->images()->delete();
-
-        // Soft delete product
         $product->delete();
 
         return response()->json([
@@ -213,7 +197,6 @@ class OnboardingController extends Controller
     {
         $user = $request->user();
 
-        // Verify user has completed both steps
         if (!$user->hasCompletedOnboarding()) {
             return response()->json([
                 'error' => 'Anda harus menyelesaikan setup bisnis dan menambahkan minimal 1 produk.',
@@ -227,10 +210,9 @@ class OnboardingController extends Controller
         ]);
     }
 
-    /**
-     * Get business types dropdown.
-     */
-    private function getBusinessTypes()
+    // ─── Lookup helpers ────────────────────────────────────────────────────────
+
+    private function getBusinessTypes(): array
     {
         return [
             'fashion' => 'Fashion & Pakaian',
@@ -245,10 +227,7 @@ class OnboardingController extends Controller
         ];
     }
 
-    /**
-     * Get product types dropdown.
-     */
-    private function getProductTypes()
+    private function getProductTypes(): array
     {
         return [
             'physical' => 'Produk Fisik',
@@ -258,10 +237,7 @@ class OnboardingController extends Controller
         ];
     }
 
-    /**
-     * Get content tone options.
-     */
-    private function getContentTones()
+    private function getContentTones(): array
     {
         return [
             'professional' => 'Profesional & Serius',
@@ -274,25 +250,7 @@ class OnboardingController extends Controller
         ];
     }
 
-    /**
-     * Get brand color options.
-     */
-    private function getBrandColors()
-    {
-        return [
-            'green' => 'Hijau Tua (Kepercayaan & Pertumbuhan)',
-            'gold' => 'Kuning Emas (Semangat & Energi)',
-            'blue' => 'Biru (Profesional & Terpercaya)',
-            'pink' => 'Pink (Kreatif & Menarik)',
-            'orange' => 'Oranye (Dinamis & Optimis)',
-            'purple' => 'Ungu (Misterius & Eksklusif)',
-        ];
-    }
-
-    /**
-     * Get Indonesian locations/cities.
-     */
-    private function getLocations()
+    private function getLocations(): array
     {
         return [
             'Jakarta' => 'Jakarta',
@@ -302,10 +260,10 @@ class OnboardingController extends Controller
             'Semarang' => 'Semarang',
             'Makassar' => 'Makassar',
             'Palembang' => 'Palembang',
-            'Tanggerang' => 'Tangerang',
+            'Tangerang' => 'Tangerang',
             'Depok' => 'Depok',
             'Bekasi' => 'Bekasi',
-            'Jogjakarta' => 'Yogyakarta',
+            'Yogyakarta' => 'Yogyakarta',
             'Bogor' => 'Bogor',
             'Batam' => 'Batam',
             'Pekanbaru' => 'Pekanbaru',
@@ -313,29 +271,11 @@ class OnboardingController extends Controller
         ];
     }
 
-    /**
-     * Map location to IANA timezone.
-     */
-    private function getTimezoneFromLocation($location)
+    private function getTimezoneFromLocation(string $location): string
     {
-        $timezones = [
-            'Jakarta' => 'Asia/Jakarta',
-            'Bandung' => 'Asia/Jakarta',
-            'Surabaya' => 'Asia/Jakarta',
-            'Medan' => 'Asia/Jakarta',
-            'Semarang' => 'Asia/Jakarta',
-            'Makassar' => 'Asia/Makassar',
-            'Palembang' => 'Asia/Jakarta',
-            'Tanggerang' => 'Asia/Jakarta',
-            'Depok' => 'Asia/Jakarta',
-            'Bekasi' => 'Asia/Jakarta',
-            'Jogjakarta' => 'Asia/Jakarta',
-            'Bogor' => 'Asia/Jakarta',
-            'Batam' => 'Asia/Jakarta',
-            'Pekanbaru' => 'Asia/Jakarta',
-            'Manado' => 'Asia/Makassar',
-        ];
-
-        return $timezones[$location] ?? 'Asia/Jakarta';
+        return match ($location) {
+            'Makassar', 'Manado' => 'Asia/Makassar',
+            default => 'Asia/Jakarta',
+        };
     }
 }
