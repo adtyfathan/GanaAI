@@ -35,7 +35,7 @@ export default function Welcome({ auth }) {
                                 className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed"
                                 style={{ color: '#58595D' }}
                             >
-                                Powered by AI. Generate jadwal konten 30 hari, caption, foto, dan video. Posting otomatis ke Instagram, TikTok, Facebook, dan X dengan satu klik.
+                                Powered by AI. Generate jadwal konten 30 hari, caption, foto, dan video. Posting otomatis ke Instagram dan TikTok dengan satu klik.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Link
@@ -81,7 +81,7 @@ export default function Welcome({ auth }) {
                                 { icon: '⚡', title: '28x Lebih Cepat', desc: 'Generate jadwal konten 30 hari hanya dalam hitungan menit, bukan jam atau hari.', accent: '#E0F8F2', border: '#A4DDD4' },
                                 { icon: '🤖', title: 'AI Powered', desc: 'AI generate ide konten, caption, dan jadwal posting yang optimal per platform.', accent: '#FDF3EA', border: '#F5D9AF' },
                                 { icon: '📸', title: 'Media Otomatis', desc: 'AI generate foto produk dan video. Semua otomatis!', accent: '#E0F8F2', border: '#A4DDD4' },
-                                { icon: '📱', title: 'Multi-Platform', desc: 'Posting ke Instagram, TikTok, Facebook, dan X dengan satu klik.', accent: '#FDF3EA', border: '#F5D9AF' },
+                                { icon: '📱', title: 'Multi-Platform', desc: 'Posting ke Instagram dan TikTok dengan satu klik.', accent: '#FDF3EA', border: '#F5D9AF' },
                                 { icon: '📅', title: 'Hari Besar Otomatis', desc: 'AI mendeteksi hari besar (Lebaran, Natal, dll) dan sisipkan konten greeting otomatis.', accent: '#E0F8F2', border: '#A4DDD4' },
                                 { icon: '📊', title: 'Analytics Real-Time', desc: 'Monitor performa konten per platform. Lihat likes, views, reach, dan engagement.', accent: '#FDF3EA', border: '#F5D9AF' },
                             ].map((card) => (
@@ -250,7 +250,7 @@ export default function Welcome({ auth }) {
                                         Posting Otomatis ke Semua Platform
                                     </h3>
                                     <p className="mb-6 leading-relaxed text-sm" style={{ color: '#58595D' }}>
-                                        Konten yang sudah jadi, langsung post otomatis ke Instagram, TikTok, Facebook, dan X sesuai jadwal.
+                                        Konten yang sudah jadi, langsung post otomatis ke Instagram dan TikTok sesuai jadwal.
                                     </p>
                                     <ul className="space-y-3">
                                         {[
@@ -328,7 +328,7 @@ export default function Welcome({ auth }) {
                         <div className="grid gap-8 md:grid-cols-4">
                             {[
                                 { step: '01', title: 'Daftar & Setup', desc: 'Buat akun, isi data bisnis, upload produk' },
-                                { step: '02', title: 'Connect Sosmed', desc: 'Connect akun IG, TikTok, FB, X.' },
+                                { step: '02', title: 'Connect Sosmed', desc: 'Connect akun IG dan TikTok.' },
                                 { step: '03', title: 'Generate Jadwal', desc: 'AI generate jadwal 30 hari otomatis' },
                                 { step: '04', title: 'Posting Otomatis', desc: 'Konten posting otomatis sesuai jadwal' },
                             ].map((item, i) => (
@@ -470,7 +470,7 @@ export default function Welcome({ auth }) {
                                 { q: 'Berapa lama untuk setup awal?', a: 'Sangat cepat! Setup hanya butuh 5 menit: (1) Daftar, (2) Isi data bisnis, (3) Connect akun sosmed, (4) Upload produk. Setelah itu, AI otomatis generate jadwal konten 30 hari untuk Anda.' },
                                 { q: 'Apakah bisa edit konten sebelum posting?', a: 'Tentu! Anda bisa preview dan edit semua caption dan jadwal posting sebelum konten naik. Fleksibel penuh — mau ubah text, ganti foto, atau reschedule? Semua bisa diatur dari dashboard.' },
                                 { q: 'Apakah saya perlu bayar sekarang?', a: 'Tidak perlu! Tier Starter gratis selamanya untuk testing. Bayar hanya saat Anda butuh fitur lebih. Tidak ada kartu kredit yang dibutuhkan untuk mulai.' },
-                                { q: 'Berapa banyak platform yang bisa dikoneksi?', a: 'Saat ini kami support 4 platform utama: Instagram, TikTok, Facebook, dan X (Twitter). Tier Starter bisa koneksi 2 Social Sets, tier Professional bisa unlimited.' },
+                                { q: 'Berapa banyak platform yang bisa dikoneksi?', a: 'Saat ini kami support 4 platform utama: Instagram dan TikTok. Tier Starter bisa koneksi 2 Social Sets, tier Professional bisa unlimited.' },
                                 { q: 'Bagaimana jika AI generate konten yang tidak sesuai?', a: 'Anda punya kontrol penuh! Edit atau hapus konten yang tidak sesuai. Feedback Anda juga membantu AI belajar preferensi Anda untuk generate yang lebih baik ke depannya.' },
                             ].map((faq) => (
                                 <details

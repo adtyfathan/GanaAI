@@ -30,7 +30,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import {
     Image02Icon, ArrowLeft01Icon, ArrowRight01Icon,
     Delete02Icon, PlusSignIcon, ProductLoadingIcon,
-    BrochureIcon, MoneyBag02Icon, PencilEdit02Icon,
+    BrochureIcon, MoneyBag02Icon,
 } from '@hugeicons/core-free-icons';
 import {
     InputGroup, InputGroupInput, InputGroupAddon,

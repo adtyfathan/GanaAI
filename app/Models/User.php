@@ -48,6 +48,11 @@ class User extends Authenticatable
         return $this->hasMany(Product::class);
     }
 
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
     /**
      * Check if user has completed onboarding (setup business profile and added at least one product).
      */

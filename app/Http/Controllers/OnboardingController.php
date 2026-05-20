@@ -13,13 +13,18 @@ use Inertia\Inertia;
 class OnboardingController extends Controller
 {
     /**
-     * Show the unified onboarding page (business + product in one view).
+     * Show the unified onboarding page (business + product + social connect).
      */
     public function showOnboarding(Request $request)
     {
         $user = $request->user();
 
         $products = $user->products()->with('images')->get();
+
+        // Akun sosmed yang sudah diconnect via Zernio
+        $connectedAccounts = $user->socialAccounts()
+            ->where('is_active', true)
+            ->get(['id', 'platform', 'account_username', 'connected_at']);
 
         return Inertia::render('Onboarding/Onboarding', [
             'businessTypes' => $this->getBusinessTypes(),
@@ -29,13 +34,17 @@ class OnboardingController extends Controller
             'products' => $products,
             'productCount' => $products->count(),
             'businessProfile' => $user->businessProfile,
+            'connectedAccounts' => $connectedAccounts,
+            'socialSetId' => $user->businessProfile?->zernio_social_set_id,
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error'),
+            ],
         ]);
     }
 
     /**
      * Store (or update) the business profile.
-     * Returns an Inertia redirect back to the same page so the frontend
-     * receives fresh props (including the saved businessProfile).
      */
     public function storeBusinessProfile(StoreBusinessProfileRequest $request)
     {
@@ -62,29 +71,22 @@ class OnboardingController extends Controller
             'timezone' => $timezone,
         ];
 
-        // Upsert: create if not exists, update if already exists
         BusinessProfile::updateOrCreate(
             ['user_id' => $user->id],
             $payload
         );
 
-        // Redirect back to the same onboarding page so Inertia reloads
-        // the page props (including businessProfile) and the frontend
-        // onSuccess callback can advance to step 2.
         return redirect()->route('onboarding.form')
             ->with('success', 'Profil bisnis berhasil disimpan!');
     }
 
     /**
      * Store a new product.
-     * Redirects back to the same onboarding page so Inertia reloads
-     * the products list in page props.
      */
     public function storeProduct(StoreProductRequest $request)
     {
         $user = $request->user();
 
-        // Guard: must have a business profile first
         if (!$user->businessProfile()->exists()) {
             return redirect()->route('onboarding.form');
         }
@@ -110,8 +112,6 @@ class OnboardingController extends Controller
             }
         }
 
-        // Redirect back to onboarding so Inertia refreshes page props
-        // (products list updates automatically via the reloaded props).
         return redirect()->route('onboarding.form')
             ->with('success', 'Produk berhasil ditambahkan!');
     }
@@ -145,14 +145,12 @@ class OnboardingController extends Controller
             'price' => $request->price,
         ]);
 
-        // Hapus gambar yang tidak ada di kept_image_ids
         $keptIds = $request->input('kept_image_ids', []);
         $product->images()
             ->when(!empty($keptIds), fn($q) => $q->whereNotIn('id', $keptIds))
             ->when(empty($keptIds), fn($q) => $q)
             ->delete();
 
-        // Tambah gambar baru
         if ($request->hasFile('new_images')) {
             $sortOrder = ($product->images()->max('sort_order') ?? 0) + 1;
             foreach ($request->file('new_images') as $image) {
@@ -191,7 +189,7 @@ class OnboardingController extends Controller
     }
 
     /**
-     * Complete onboarding and redirect to dashboard.
+     * Complete onboarding — minimal 1 produk + 1 akun sosmed terconnect.
      */
     public function completeOnboarding(Request $request)
     {
@@ -199,7 +197,7 @@ class OnboardingController extends Controller
 
         if (!$user->hasCompletedOnboarding()) {
             return response()->json([
-                'error' => 'Anda harus menyelesaikan setup bisnis dan menambahkan minimal 1 produk.',
+                'error' => 'Selesaikan setup bisnis, tambahkan minimal 1 produk, dan hubungkan minimal 1 akun sosial media.',
             ], 422);
         }
 

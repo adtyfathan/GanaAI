@@ -9,19 +9,20 @@ import {
     Package01Icon,
     Tick02Icon,
     InstagramIcon,
-    CheckmarkBadge01Icon
+    CheckmarkBadge01Icon,
 } from '@hugeicons/core-free-icons';
 
 import BusinessProfileForm from './BusinessProfileForm';
 import ProductForm from './ProductForm';
+import SocialAccountForm from './SocialAccountForm';
 
 // ─── Step Indicator ───────────────────────────────────────────────────────────
 function StepIndicator({ currentStep }) {
     const steps = [
         { id: 1, label: 'Profil Bisnis', icon: Store01Icon },
         { id: 2, label: 'Produk', icon: Package01Icon },
-        { id: 3, label: 'Social Media', icon:  InstagramIcon},
-        { id: 4, label: 'Preview', icon: CheckmarkBadge01Icon },
+        { id: 3, label: 'Social Media', icon: InstagramIcon },
+        { id: 4, label: 'Selesai', icon: CheckmarkBadge01Icon },
     ];
 
     return (
@@ -70,7 +71,9 @@ function StepIndicator({ currentStep }) {
                                 <motion.div
                                     className="h-full bg-orange-400 rounded-full"
                                     initial={{ width: '0%' }}
-                                    animate={{ width: currentStep > 1 ? '100%' : '0%' }}
+                                    animate={{
+                                        width: currentStep > step.id ? '100%' : '0%',
+                                    }}
                                     transition={{ duration: 0.5, ease: 'easeInOut' }}
                                 />
                             </div>
@@ -84,14 +87,19 @@ function StepIndicator({ currentStep }) {
 
 // ─── Mascot Aside ─────────────────────────────────────────────────────────────
 function MascotAside({ step }) {
+    const mascots = {
+        1: '/images/business-mascot.webp',
+        2: '/images/product-mascot.webp',
+        3: '/images/social-mascot.webp',
+    };
+
     return (
         <aside className="hidden lg:flex flex-col items-center justify-center sticky top-16 h-[calc(100vh-64px)] overflow-hidden px-6">
             <div className="relative flex flex-col items-center justify-center gap-8">
-                {/* Pulsing rings */}
                 {[86, 72, 56].map((size, i) => (
                     <motion.span
                         key={size}
-                        className={`absolute w-${size} h-${size} rounded-full`}
+                        className="absolute rounded-full"
                         style={{
                             width: `${size * 4}px`,
                             height: `${size * 4}px`,
@@ -110,10 +118,9 @@ function MascotAside({ step }) {
                     />
                 ))}
 
-                {/* Mascot */}
                 <motion.img
                     key={step}
-                    src={step === 1 ? '/images/business-mascot.webp' : '/images/product-mascot.webp'}
+                    src={mascots[step] ?? mascots[1]}
                     alt="Maskot AI"
                     className="relative z-10 w-72 h-auto object-contain drop-shadow-xl"
                     initial={{ opacity: 0, y: 20 }}
@@ -122,16 +129,14 @@ function MascotAside({ step }) {
                         opacity: { duration: 0.4 },
                         y: { duration: 4.5, ease: 'easeInOut', repeat: Infinity, delay: 0.4 },
                     }}
-                    onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                    }}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
             </div>
         </aside>
     );
 }
 
-// ─── Animation variants (shared across steps) ─────────────────────────────────
+// ─── Animation variants ───────────────────────────────────────────────────────
 const stepVariants = {
     enter: (dir) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
     center: { x: 0, opacity: 1 },
@@ -139,7 +144,7 @@ const stepVariants = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// MAIN COMPONENT — Onboarding orchestrator
+// MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function Onboarding({
     businessTypes,
@@ -149,21 +154,30 @@ export default function Onboarding({
     products: initialProducts = [],
     productCount = 0,
     businessProfile = null,
+    connectedAccounts = [],
+    socialSetId = null,
+    flash = {},
 }) {
-    const [currentStep, setCurrentStep] = useState(businessProfile ? 2 : 1);
-    const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
+    // Determine initial step based on data already saved
+    const getInitialStep = () => {
+        if (!businessProfile) return 1;
+        if (initialProducts.length === 0) return 2;
+        return 3;
+    };
+
+    const [currentStep, setCurrentStep] = useState(getInitialStep());
+    const [direction, setDirection] = useState(1);
     const [businessSaved, setBusinessSaved] = useState(!!businessProfile);
 
-    const goToStep2 = () => {
-        setBusinessSaved(true);
-        setDirection(1);
-        setCurrentStep(2);
+    const goTo = (step) => {
+        setDirection(step > currentStep ? 1 : -1);
+        setCurrentStep(step);
     };
 
-    const goToStep1 = () => {
-        setDirection(-1);
-        setCurrentStep(1);
-    };
+    const goToStep2 = () => { setBusinessSaved(true); goTo(2); };
+    const goToStep1 = () => goTo(1);
+    const goToStep3 = () => goTo(3);
+    const goToStep2Back = () => goTo(2);
 
     const handleComplete = () => {
         fetch(route('onboarding.complete'), {
@@ -174,45 +188,24 @@ export default function Onboarding({
             },
         })
             .then((r) => r.json())
-            .then((d) => {
-                if (d.success) window.location.href = d.redirect;
-            })
+            .then((d) => { if (d.success) window.location.href = d.redirect; })
             .catch(console.error);
     };
 
-    // const progressValue = currentStep === 1 ? 25 : 75;
-    const progressValue = currentStep * 25;
-
     return (
-        <OnboardingLayout step={currentStep} totalSteps={2}>
+        <OnboardingLayout step={currentStep} totalSteps={3}>
             <div className="min-h-screen bg-[#FAFAF8] font-dm">
                 <div className="mx-auto max-w-[1200px] grid grid-cols-1 lg:grid-cols-[1fr_360px] min-h-[calc(100vh-64px)]">
 
                     {/* ══ LEFT — form column ══ */}
                     <div className="border-r border-neutral-100 pt-10 pb-24 px-6 sm:px-10 lg:px-14 overflow-hidden">
 
-                        {/* Top: badge + progress */}
                         <Badge className="mb-5 inline-flex items-center gap-1.5 bg-orange-50 text-orange-600 border border-orange-100 rounded-full px-3 py-1 text-[10px] font-semibold tracking-[0.09em] uppercase hover:bg-orange-50 cursor-default">
                             Langkah {currentStep} dari 4
                         </Badge>
 
-                        {/* <div className="flex items-center gap-3 mb-8">
-                            <div className="flex-1 h-[3px] bg-neutral-200 rounded-full overflow-hidden">
-                                <motion.div
-                                    className="h-full bg-orange-500 rounded-full"
-                                    animate={{ width: `${progressValue}%` }}
-                                    transition={{ duration: 0.5, ease: 'easeInOut' }}
-                                />
-                            </div>
-                            <span className="text-xs font-semibold text-neutral-400 tracking-wide shrink-0">
-                                {progressValue}%
-                            </span>
-                        </div> */}
-
-                        {/* Step dots */}
                         <StepIndicator currentStep={currentStep} />
 
-                        {/* ── Animated step content ── */}
                         <AnimatePresence mode="wait" custom={direction}>
                             {currentStep === 1 && (
                                 <BusinessProfileForm
@@ -235,6 +228,19 @@ export default function Onboarding({
                                     productCount={productCount}
                                     businessSaved={businessSaved}
                                     onBack={goToStep1}
+                                    onComplete={goToStep3}
+                                    variants={stepVariants}
+                                    direction={direction}
+                                />
+                            )}
+
+                            {currentStep === 3 && (
+                                <SocialAccountForm
+                                    key="step-3"
+                                    connectedAccounts={connectedAccounts}
+                                    socialSetId={socialSetId}
+                                    flash={flash}
+                                    onBack={goToStep2Back}
                                     onComplete={handleComplete}
                                     variants={stepVariants}
                                     direction={direction}
