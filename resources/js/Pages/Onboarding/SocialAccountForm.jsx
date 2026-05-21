@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { HugeiconsIcon } from '@hugeicons/react';
+import { Button } from '@/components/ui/button';
 import {
     ArrowRight01Icon,
     ArrowLeft01Icon,
@@ -295,7 +296,13 @@ export default function SocialAccountForm({
     const getConnectedAccount = (platformId) =>
         accounts.find(a => a.platform === platformId && a.is_active !== false) ?? null;
 
-    // ─────────────────────────────────────────────────────────────────────────
+    const handleComplete = () => {
+        if (!canContinue) {
+            toast.error('Hubungkan minimal 1 platform untuk melanjutkan.');
+            return;
+        }
+        onComplete?.();
+    };
 
     return (
         <motion.div
@@ -406,24 +413,20 @@ export default function SocialAccountForm({
                     Kembali ke Produk
                 </button>
 
-                {canContinue ? (
-                    <button
-                        type="button"
-                        onClick={onComplete}
-                        className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
-                    >
-                        Selesai &amp; Mulai
-                        <HugeiconsIcon
-                            icon={ArrowRight01Icon}
-                            size={16}
-                            className="transition-transform duration-200 group-hover:translate-x-1"
-                        />
-                    </button>
-                ) : (
-                    <p className="text-[13px] text-neutral-400">
-                        Hubungkan minimal 1 platform untuk melanjutkan.
-                    </p>
-                )}
+                <Button
+                    type="button"
+                    onClick={onComplete}
+                    disabled={!canContinue}
+                    className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                >
+                    Lihat Preview
+                    <HugeiconsIcon
+                        icon={ArrowRight01Icon}
+                        size={16}
+                        onClick={handleComplete}
+                        className="transition-transform duration-200 group-hover:translate-x-1"
+                    />
+                </Button>
             </div>
         </motion.div>
     );

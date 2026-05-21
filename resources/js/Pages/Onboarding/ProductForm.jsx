@@ -618,14 +618,15 @@ export default function ProductForm({
                             <HugeiconsIcon icon={ArrowLeft01Icon} size={15} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
                             Kembali ke Profil Bisnis
                         </button>
-                        {products.length > 0 ? (
-                            <Button type="button" onClick={handleComplete} className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
-                                Lanjut ke Media Sosial
-                                <HugeiconsIcon icon={ArrowRight01Icon} size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
-                            </Button>
-                        ) : (
-                            <p className="text-[13px] text-neutral-400">Tambahkan minimal 1 produk untuk melanjutkan.</p>
-                        )}
+                        <Button
+                            type="button"
+                            disabled={products.length === 0}
+                            onClick={handleComplete}
+                            className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                        >
+                            Lanjut ke Media Sosial
+                            <HugeiconsIcon icon={ArrowRight01Icon} size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
+                        </Button>
                     </div>
                 )}
             </motion.div>

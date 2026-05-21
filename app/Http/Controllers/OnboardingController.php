@@ -221,7 +221,6 @@ class OnboardingController extends Controller
             'handmade' => 'Kerajinan Tangan',
             'education' => 'Pendidikan & Kursus',
             'services' => 'Jasa & Konsultasi',
-            'others' => 'Lainnya',
         ];
     }
 

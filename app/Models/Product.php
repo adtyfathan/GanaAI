@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Product extends Model
 {
@@ -46,5 +47,18 @@ class Product extends Model
     public function contentIdeas(): HasMany
     {
         return $this->hasMany(ContentIdea::class);
+    }
+
+    protected function formatProductType(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => match ($value) {
+                'physical' => 'Produk Fisik',
+                'digital' => 'Produk Digital',
+                'service' => 'Layanan',
+                'subscription' => 'Langganan',
+                default => ucwords(str_replace('_', ' ', $value)),
+            }
+        );
     }
 }

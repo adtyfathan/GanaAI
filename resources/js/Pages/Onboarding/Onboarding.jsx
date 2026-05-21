@@ -15,6 +15,7 @@ import {
 import BusinessProfileForm from './BusinessProfileForm';
 import ProductForm from './ProductForm';
 import SocialAccountForm from './SocialAccountForm';
+import Preview from './Preview';
 
 // ─── Step Indicator ───────────────────────────────────────────────────────────
 function StepIndicator({ currentStep }) {
@@ -22,7 +23,7 @@ function StepIndicator({ currentStep }) {
         { id: 1, label: 'Profil Bisnis', icon: Store01Icon },
         { id: 2, label: 'Produk', icon: Package01Icon },
         { id: 3, label: 'Social Media', icon: InstagramIcon },
-        { id: 4, label: 'Selesai', icon: CheckmarkBadge01Icon },
+        { id: 4, label: 'Preview', icon: CheckmarkBadge01Icon },
     ];
 
     return (
@@ -91,6 +92,7 @@ function MascotAside({ step }) {
         1: '/images/business-mascot.webp',
         2: '/images/product-mascot.webp',
         3: '/images/social-mascot.webp',
+        4: '/images/preview-mascot.webp',
     };
 
     return (
@@ -162,7 +164,8 @@ export default function Onboarding({
     const getInitialStep = () => {
         if (!businessProfile) return 1;
         if (initialProducts.length === 0) return 2;
-        return 3;
+        if (connectedAccounts.length === 0) return 3;
+        return 4;
     };
 
     const [currentStep, setCurrentStep] = useState(getInitialStep());
@@ -177,7 +180,9 @@ export default function Onboarding({
     const goToStep2 = () => { setBusinessSaved(true); goTo(2); };
     const goToStep1 = () => goTo(1);
     const goToStep3 = () => goTo(3);
+    const goToStep4 = () => goTo(4);
     const goToStep2Back = () => goTo(2);
+    const gotoStep3Back = () => goTo(3);
 
     const handleComplete = () => {
         fetch(route('onboarding.complete'), {
@@ -193,7 +198,7 @@ export default function Onboarding({
     };
 
     return (
-        <OnboardingLayout step={currentStep} totalSteps={3}>
+        <OnboardingLayout step={currentStep} totalSteps={4}>
             <div className="min-h-screen bg-[#FAFAF8] font-dm">
                 <div className="mx-auto max-w-[1200px] grid grid-cols-1 lg:grid-cols-[1fr_360px] min-h-[calc(100vh-64px)]">
 
@@ -241,9 +246,20 @@ export default function Onboarding({
                                     socialSetId={socialSetId}
                                     flash={flash}
                                     onBack={goToStep2Back}
-                                    onComplete={handleComplete}
+                                    onComplete={goToStep4}
                                     variants={stepVariants}
                                     direction={direction}
+                                />
+                            )}
+
+                            {currentStep === 4 && (
+                                <Preview
+                                    key="step-4"
+                                    businessProfile={businessProfile}
+                                    products={initialProducts}
+                                    productCount={productCount}
+                                    onBack={gotoStep3Back}
+                                    connectedAccounts={connectedAccounts}
                                 />
                             )}
                         </AnimatePresence>
