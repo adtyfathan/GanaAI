@@ -32,7 +32,7 @@ export default function Register() {
                 <p className="mt-1 text-sm text-gray-500 font-dm">
                     Mulai perjalanan Anda bersama GanaAI
                 </p>
-                <div className="mt-4 h-px w-12 bg-gradient-to-r from-orange-500 to-orange-300" />
+                <div className="mt-4 h-px w-12 bg-linear-to-r from-orange-500 to-orange-300" />
             </div>
 
             <form onSubmit={submit} className="space-y-5">

@@ -32,7 +32,7 @@ export default function Login({ status, canResetPassword }) {
                 <p className="mt-1 text-sm text-gray-500 font-dm">
                     Masuk ke akun GanaAI Anda
                 </p>
-                <div className="mt-4 h-px w-12 bg-gradient-to-r from-orange-500 to-orange-300" />
+                <div className="mt-4 h-px w-12 bg-linear-to-r from-orange-500 to-orange-300" />
             </div>
 
             {status && (

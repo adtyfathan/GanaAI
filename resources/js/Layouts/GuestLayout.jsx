@@ -27,7 +27,7 @@ export default function GuestLayout({ children }) {
             </div>
 
             {/* ─── Panel Kanan: Form ─── */}
-            <div className="flex w-full flex-col items-center justify-center overflow-y-auto px-6 py-12 lg:w-[480px] lg:flex-shrink-0 lg:px-14 lg:border-l lg:border-gray-200">
+            <div className="flex w-full flex-col items-center justify-center overflow-y-auto px-6 py-12 lg:w-[480px] lg:shrink-0 lg:px-14 lg:border-l lg:border-gray-200">
                 <div className="w-full max-w-sm">
 
                     {/* Logo mobile — hanya tampil < lg */}

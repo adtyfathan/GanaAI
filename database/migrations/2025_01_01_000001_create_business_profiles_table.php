@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('business_profiles', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');
-            $table->string('zernio_social_set_id', 100);
+            $table->string('zernio_social_set_id', 100)->nullable();
             $table->string('logo_path', 255)->nullable();
             $table->string('business_name', 150);
             $table->string('business_type', 100);

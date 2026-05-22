@@ -4,6 +4,27 @@ dan terpercaya. Platform ini membantu pelaku usaha kecil mengotomasi
 konten sosial media mereka dengan AI.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
+TECH STACK
+━━━━━━━━━━━━━━━━━━━━━━━━
+- Menggunakan Tailwind CSS 3.2.1
+- Menggunakan shadcn 4.7.0 (Tambahkan components yang diperlukan)
+- Menggunakan shadcn dengan preset b3lV3gFV2
+- Preset
+  code         b3lV3gFV2
+  version      b
+  style        mira
+  baseColor    neutral
+  theme        orange
+  chartColor   orange
+  iconLibrary  hugeicons
+  font         inter
+  fontHeading  inherit
+  radius       default
+  menuAccent   subtle
+  menuColor    default
+  url          https://ui.shadcn.com/create?preset=b3lV3gFV
+
+━━━━━━━━━━━━━━━━━━━━━━━━
 PALET WARNA
 ━━━━━━━━━━━━━━━━━━━━━━━━
 - Background utama: #FFFFFF (krem hangat — terasa lokal, tidak steril)

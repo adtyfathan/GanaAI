@@ -26,7 +26,7 @@ export default function ForgotPassword({ status }) {
                 <p className="mt-1 text-sm text-gray-500 font-dm">
                     Masukkan email Anda dan kami akan kirimkan tautan reset
                 </p>
-                <div className="mt-4 h-px w-12 bg-gradient-to-r from-orange-500 to-orange-300" />
+                <div className="mt-4 h-px w-12 bg-linear-to-r from-orange-500 to-orange-300" />
             </div>
 
             {status && (

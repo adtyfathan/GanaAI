@@ -7,7 +7,7 @@
 ---
 
 ### Konsep Platform
-Website AI-based untuk otomasi pembuatan, penjadwalan, dan pengunggahan konten di sosial media (IG, TT, X, FB) yang berfokus pada UMKM lokal Indonesia.
+Website AI-based untuk otomasi pembuatan, penjadwalan, dan pengunggahan konten di sosial media (IG dan TT) yang berfokus pada UMKM lokal Indonesia.
 
 ---
 
@@ -75,12 +75,11 @@ Website AI-based untuk otomasi pembuatan, penjadwalan, dan pengunggahan konten d
 ### Keputusan Teknis Penting
 
 **Zernio sebagai jembatan sosmed:**
-- Sudah menjadi Meta, TikTok, dan X Official Partner — tidak perlu Meta App Review sendiri
+- Sudah menjadi Meta, TikTok, Official Partner — tidak perlu Meta App Review sendiri
 - Support 15+ platform, handle semua OAuth dan approval platform
 - Free tier: 2 Social Sets, 20 posts/bulan (cukup untuk development & testing)
 - 1 user UMKM = 1 Zernio Social Set (ID disimpan di `business_profiles.zernio_social_set_id`)
 - Setiap akun sosmed per platform menghasilkan `zernio_account_id` tersendiri (disimpan di `social_accounts`)
-- Facebook: `zernio_account_id` berisi Page ID (bukan User ID) karena butuh secondary selection setelah OAuth
 
 **Zernio tidak punya endpoint update post.** Solusi: strategi **Delete & Recreate** — saat user regenerate konten, platform DELETE `zernio_post_id` lama lalu CREATE post baru dengan jadwal yang sama. `zernio_post_id` baru disimpan kembali di `post_schedules`.
 
@@ -251,8 +250,8 @@ Menyimpan akun sosmed yang sudah di-connect via Zernio OAuth.
 |---|---|---|
 | id | ULID PK | |
 | user_id | ULID FK → users | |
-| platform | varchar(50) | `instagram`, `tiktok`, `facebook`, `x` |
-| zernio_account_id | varchar(100) | account ID dari Zernio — untuk Facebook berisi Page ID |
+| platform | varchar(50) | `instagram`, `tiktok` |
+| zernio_account_id | varchar(100) | account ID dari Zernio |
 | account_username | varchar(100) | nullable, untuk display |
 | is_active | boolean | default true |
 | connected_at | timestamp | |
