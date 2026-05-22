@@ -16,6 +16,7 @@ import BusinessProfileForm from './BusinessProfileForm';
 import ProductForm from './ProductForm';
 import SocialAccountForm from './SocialAccountForm';
 import Preview from './Preview';
+import { router } from '@inertiajs/react';
 
 // ─── Step Indicator ───────────────────────────────────────────────────────────
 function StepIndicator({ currentStep }) {
@@ -170,32 +171,14 @@ export default function Onboarding({
 
     const [currentStep, setCurrentStep] = useState(getInitialStep());
     const [direction, setDirection] = useState(1);
-    const [businessSaved, setBusinessSaved] = useState(!!businessProfile);
 
     const goTo = (step) => {
         setDirection(step > currentStep ? 1 : -1);
         setCurrentStep(step);
     };
 
-    const goToStep2 = () => { setBusinessSaved(true); goTo(2); };
-    const goToStep1 = () => goTo(1);
-    const goToStep3 = () => goTo(3);
-    const goToStep4 = () => goTo(4);
-    const goToStep2Back = () => goTo(2);
-    const gotoStep3Back = () => goTo(3);
-
-    const handleComplete = () => {
-        fetch(route('onboarding.complete'), {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then((r) => r.json())
-            .then((d) => { if (d.success) window.location.href = d.redirect; })
-            .catch(console.error);
-    };
+    const completeOnboarding = () =>
+        router.post(route('onboarding.complete'));
 
     return (
         <OnboardingLayout step={currentStep} totalSteps={4}>
@@ -219,21 +202,20 @@ export default function Onboarding({
                                     contentTones={contentTones}
                                     locations={locations}
                                     businessProfile={businessProfile}
-                                    onSuccess={goToStep2}
+                                    onSuccess={() =>goTo(2)}
                                     variants={stepVariants}
                                     direction={direction}
                                 />
                             )}
 
-                            {currentStep === 2 && (
+                             {currentStep === 2 && (
                                 <ProductForm
                                     key="step-2"
                                     productTypes={productTypes}
                                     products={initialProducts}
                                     productCount={productCount}
-                                    businessSaved={businessSaved}
-                                    onBack={goToStep1}
-                                    onComplete={goToStep3}
+                                    onBack={() => goTo(1)}
+                                    onComplete={() => goTo(3)}
                                     variants={stepVariants}
                                     direction={direction}
                                 />
@@ -245,8 +227,8 @@ export default function Onboarding({
                                     connectedAccounts={connectedAccounts}
                                     socialSetId={socialSetId}
                                     flash={flash}
-                                    onBack={goToStep2Back}
-                                    onComplete={goToStep4}
+                                    onBack={() => goTo(2)}
+                                    onComplete={() => goTo(4)}
                                     variants={stepVariants}
                                     direction={direction}
                                 />
@@ -258,7 +240,8 @@ export default function Onboarding({
                                     businessProfile={businessProfile}
                                     products={initialProducts}
                                     productCount={productCount}
-                                    onBack={gotoStep3Back}
+                                    onBack={() => goTo(3)}
+                                    onComplete={completeOnboarding}
                                     connectedAccounts={connectedAccounts}
                                 />
                             )}

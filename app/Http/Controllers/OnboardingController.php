@@ -201,11 +201,7 @@ class OnboardingController extends Controller
             ], 422);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Onboarding selesai! Silakan lanjut ke dashboard.',
-            'redirect' => route('dashboard'),
-        ]);
+        return redirect()->route('dashboard');
     }
 
     // ─── Lookup helpers ────────────────────────────────────────────────────────

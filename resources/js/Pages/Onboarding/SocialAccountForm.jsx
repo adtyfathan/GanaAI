@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import {
     ArrowRight01Icon,
     ArrowLeft01Icon,
-    CheckmarkCircle01Icon,
     Cancel01Icon,
     RefreshIcon,
     Loading03Icon,
@@ -79,60 +78,62 @@ function PlatformCard({ platform, connectedAccount, onConnect, onDisconnect, isL
             exit={{ opacity: 0, scale: 0.94, y: -8 }}
             transition={{ duration: 0.25 }}
             className={`
-                relative flex items-center gap-4 rounded-xl border p-4 transition-all duration-200 group
+                relative flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border p-4 transition-all duration-200
                 ${isConnected
                     ? 'bg-green-50/80 border-green-200 shadow-sm'
-                    : 'bg-white border-neutral-100 hover:border-neutral-200 hover:shadow-md cursor-default'
+                    : 'bg-white border-neutral-100 hover:border-neutral-200 hover:shadow-md'
                 }
             `}
         >
-            {/* Platform icon badge */}
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${platform.bg} border ${platform.border}`}>
-                <Icon />
-            </div>
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-[14px] text-neutral-900">{platform.label}</span>
-                    {isConnected && (
-                        <motion.span
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                            className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-[0.09em] px-2 py-0.5 rounded-full"
-                        >
-                            <HugeiconsIcon icon={Tick02Icon} size={9} />
-                            Terhubung
-                        </motion.span>
-                    )}
-                    {!isConnected && (
-                        <span className={`inline-flex items-center text-[10px] font-semibold uppercase tracking-[0.09em] px-2 py-0.5 rounded-full ${platform.badgeBg} ${platform.badgeText}`}>
-                            {platform.description}
-                        </span>
-                    )}
+            {/* Baris atas: icon + info + tombol (semua inline di sm, di mobile icon+info saja) */}
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+                {/* Platform icon badge */}
+                <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 ${platform.bg} border ${platform.border}`}>
+                    <Icon />
                 </div>
 
-                {isConnected ? (
-                    <p className="text-[12px] text-green-600 font-medium mt-0.5">
-                        {connectedAccount.account_username
-                            ? `@${connectedAccount.account_username}`
-                            : platform.description}
-                    </p>
-                ) : (
-                    <p className="text-[12px] text-neutral-400 mt-0.5">Belum terhubung</p>
-                )}
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-[14px] text-neutral-900">{platform.label}</span>
+                        {isConnected && (
+                            <motion.span
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                                className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-[0.09em] px-2 py-0.5 rounded-full"
+                            >
+                                <HugeiconsIcon icon={Tick02Icon} size={9} />
+                                Terhubung
+                            </motion.span>
+                        )}
+                        {!isConnected && (
+                            <span className={`inline-flex items-center text-[10px] font-semibold uppercase tracking-[0.09em] px-2 py-0.5 rounded-full ${platform.badgeBg} ${platform.badgeText}`}>
+                                {platform.description}
+                            </span>
+                        )}
+                    </div>
+                    {isConnected ? (
+                        <p className="text-[12px] text-green-600 font-medium mt-0.5 truncate">
+                            {connectedAccount.account_username
+                                ? `@${connectedAccount.account_username}`
+                                : platform.description}
+                        </p>
+                    ) : (
+                        <p className="text-[12px] text-neutral-400 mt-0.5">Belum terhubung</p>
+                    )}
+                </div>
             </div>
 
-            {/* Action button */}
-            <div className="shrink-0">
+            {/* Action button — full width di mobile, auto di sm */}
+            <div className="shrink-0 w-full sm:w-auto">
                 {isConnected ? (
                     <button
                         type="button"
                         onClick={() => onDisconnect(connectedAccount.id)}
                         disabled={isDisconnecting}
                         className={`
-                            flex items-center gap-2 text-[13px] font-bold px-4 py-2 rounded-lg transition-all duration-200 font-jakarta
+                            w-full sm:w-autob flex items-center justify-center gap-2 text-[13px] font-bold px-4 py-2 rounded-lg transition-all duration-200 font-jakarta cursor-pointer
                             ${isDisconnecting
                                 ? 'bg-red-300 text-white cursor-not-allowed'
                                 : 'bg-red-500 hover:bg-red-600 text-white shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.28)] hover:-translate-y-0.5 active:translate-y-0'
@@ -147,7 +148,7 @@ function PlatformCard({ platform, connectedAccount, onConnect, onDisconnect, isL
                                 >
                                     <HugeiconsIcon icon={Loading03Icon} size={13} />
                                 </motion.span>
-                                <span>Memutuskan...</span>
+                                Memutuskan...
                             </>
                         ) : (
                             <>
@@ -162,7 +163,7 @@ function PlatformCard({ platform, connectedAccount, onConnect, onDisconnect, isL
                         onClick={() => onConnect(platform.id)}
                         disabled={isLoading}
                         className={`
-                            flex items-center gap-2 text-[13px] font-bold px-4 py-2 rounded-lg transition-all duration-200 font-jakarta
+                            w-full sm:w-auto flex items-center justify-center gap-2 text-[13px] font-bold px-4 py-2 rounded-lg transition-all duration-200 font-jakarta cursor-pointer
                             ${isLoading
                                 ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
                                 : 'bg-orange-500 hover:bg-orange-600 text-white shadow-sm hover:shadow-[0_4px_12px_rgba(249,115,22,0.25)] hover:-translate-y-0.5 active:translate-y-0'
@@ -177,7 +178,7 @@ function PlatformCard({ platform, connectedAccount, onConnect, onDisconnect, isL
                                 >
                                     <HugeiconsIcon icon={Loading03Icon} size={13} />
                                 </motion.span>
-                                <span>Menghubungkan...</span>
+                                Menghubungkan...
                             </>
                         ) : (
                             <>
@@ -335,14 +336,17 @@ export default function SocialAccountForm({
                         transition={{ duration: 0.25 }}
                         className="overflow-hidden mb-5"
                     >
-                        <div className="flex items-center justify-between mb-3">
-                            <h2 className="text-[14px] font-semibold text-neutral-700">
+                        <div className="flex items-center justify-between mb-3 gap-2">
+                            <h2 className="text-[14px] font-semibold text-neutral-700 shrink-0">
                                 Platform Terhubung
                                 <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-orange-100 text-orange-600 text-[11px] font-bold">
                                     {connectedCount}
                                 </span>
                             </h2>
-                            <p className="text-[11px] text-neutral-400">Tambahkan akun untuk posting konten</p>
+                            <p className="text-[11px] text-neutral-400 text-right">
+                                <span class="hidden sm:inline">Tambahkan akun untuk posting konten</span>
+                                <span class="sm:hidden">Tambahkan akun</span>
+                            </p>
                         </div>
                     </motion.div>
                 )}
@@ -403,23 +407,25 @@ export default function SocialAccountForm({
                 <button
                     type="button"
                     onClick={onBack}
-                    className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                    className="group cursor-pointer inline-flex items-center gap-1.5 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[13px] sm:text-[15px] px-4 sm:px-7 py-3 sm:py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                 >
                     <HugeiconsIcon
                         icon={ArrowLeft01Icon}
                         size={15}
                         className="transition-transform duration-200 group-hover:-translate-x-0.5"
                     />
-                    Kembali ke Produk
+                    <span class="hidden sm:inline">Kembali ke Produk</span>
+                    <span class="sm:hidden">Kembali</span>
                 </button>
 
                 <Button
                     type="button"
                     onClick={onComplete}
                     disabled={!canContinue}
-                    className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                    className="group cursor-pointer inline-flex items-center gap-1.5 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[13px] sm:text-[15px] px-4 sm:px-7 py-3 sm:py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                 >
-                    Lihat Preview
+                    <span class="hidden sm:inline">Lihat Preview</span>
+                    <span class="sm:hidden">Preview</span>
                     <HugeiconsIcon
                         icon={ArrowRight01Icon}
                         size={16}

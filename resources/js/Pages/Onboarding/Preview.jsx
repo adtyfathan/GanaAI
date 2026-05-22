@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Button } from '@/components/ui/button';
+import { Toaster } from "@/components/ui/sonner";
 import {
     Store01Icon,
     Package01Icon,
@@ -240,17 +241,21 @@ export default function Preview({
     products = [],
     productCount = 0,
     onBack,
-    connectedAccounts = [],
     onComplete,
+    connectedAccounts = [],
 }) {
     const [isCompleting, setIsCompleting] = useState(false);
-
     const handleComplete = async () => {
-        if (!onComplete) return;
+        if (!onComplete) {
+            toast.error('Selesaikan pendaftaran dahulu.');
+            return;
+        }
         setIsCompleting(true);
         try {
-            await onComplete();
+            await onComplete?.();
         } catch {
+            toast.error('Gagal menyelesaikan pendaftaran. Silakan coba lagi.');
+        } finally {
             setIsCompleting(false);
         }
     };
@@ -399,30 +404,31 @@ export default function Preview({
                 <button
                     type="button"
                     onClick={onBack}
-                    className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                    className="group cursor-pointer inline-flex items-center gap-1.5 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[13px] sm:text-[15px] px-4 sm:px-7 py-3 sm:py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                 >
                     <HugeiconsIcon
                         icon={ArrowLeft01Icon}
                         size={15}
                         className="transition-transform duration-200 group-hover:-translate-x-0.5"
                     />
-                    Kembali ke Akun
+                    <span class="hidden sm:inline">Kembali ke Akun</span>
+                    <span class="sm:hidden">Kembali</span>
                 </button>
 
                 <Button
                     type="button"
                     onClick={handleComplete}
                     disabled={!allDone || isCompleting}
-                    className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                    className="group cursor-pointer inline-flex items-center gap-1.5 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[13px] sm:text-[15px] px-4 sm:px-7 py-3 sm:py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                 >
-                    Mulai Sekarang
+                    <span class="hidden sm:inline">Mulai Sekarang</span>
+                    <span class="sm:hidden">Mulai</span>
                     <HugeiconsIcon
                         icon={ArrowRight01Icon}
                         size={16}
                         className="transition-transform duration-200 group-hover:translate-x-1"
                     />
                 </Button>
-                {/* <CompletionCTA onComplete={handleComplete} isCompleting={isCompleting} allDone={allDone} /> */}
             </div>
         </motion.div>
     );

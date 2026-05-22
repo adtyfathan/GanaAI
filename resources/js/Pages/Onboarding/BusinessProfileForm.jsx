@@ -24,13 +24,16 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
     BankIcon,
-    Location01Icon,
     UserIcon,
     Target01Icon,
     NoteIcon,
     Image02Icon,
     ArrowRight01Icon,
 } from '@hugeicons/core-free-icons';
+
+// ── Komponen peta lokasi dinamis ──────────────────────────────────────────────
+// Pastikan sudah install: npm install leaflet react-leaflet
+import LocationPickerField from '@/Components/LocationPickerField';
 
 // ─── Shared styles ────────────────────────────────────────────────────────────
 const inputCls =
@@ -58,7 +61,6 @@ function toOptions(obj) {
 export default function BusinessProfileForm({
     businessTypes,
     contentTones,
-    locations,
     businessProfile,
     onSuccess,
     variants,
@@ -78,7 +80,7 @@ export default function BusinessProfileForm({
         uniqueness: businessProfile?.uniqueness || '',
         target_audience: businessProfile?.target_audience || '',
         content_tone: businessProfile?.content_tone || '',
-        location: businessProfile?.location || '',
+        location: businessProfile?.location || '',  
         logo: null,
     });
 
@@ -124,7 +126,7 @@ export default function BusinessProfileForm({
 
             <form onSubmit={handleSubmit} className="space-y-5">
 
-                {/* Logo */}
+                {/* ── Logo ── */}
                 <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-xl border-2 border-dashed border-neutral-200 bg-neutral-50 flex items-center justify-center shrink-0 overflow-hidden">
                         {previewLogo ? (
@@ -153,7 +155,7 @@ export default function BusinessProfileForm({
                     </Field>
                 </div>
 
-                {/* Nama Bisnis */}
+                {/* ── Nama Bisnis ── */}
                 <Field className="space-y-1.5">
                     <FieldLabel htmlFor="business_name" className="text-[13px] font-semibold text-neutral-800">
                         Nama Bisnis
@@ -173,66 +175,48 @@ export default function BusinessProfileForm({
                     <FieldError message={bizErrors.business_name} />
                 </Field>
 
-                {/* Jenis Bisnis + Lokasi */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Field className="space-y-1.5">
-                        <FieldLabel className="text-[13px] font-semibold text-neutral-800">
-                            Jenis Bisnis
-                        </FieldLabel>
-                        <InputGroup>
-                            <InputGroupAddon align="inline-start">
-                                <HugeiconsIcon icon={UserIcon} size={16} className="text-neutral-400 mr-2" />
-                            </InputGroupAddon>
-                            <Select
-                                value={bizData.business_type}
-                                onValueChange={(v) => setBizData('business_type', v)}
-                            >
-                                <SelectTrigger className={`${selectCls} w-full`}>
-                                    <SelectValue placeholder="Pilih jenis bisnis..." />
-                                </SelectTrigger>
-                                <SelectContent position="popper" className="bg-white border border-neutral-100 shadow-lg">
-                                    <SelectGroup>
-                                        <SelectLabel>Jenis Bisnis</SelectLabel>
-                                        {toOptions(businessTypes).map(({ value, label }) => (
-                                            <SelectItem key={value} value={value}>{label}</SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </InputGroup>
-                        <FieldError message={bizErrors.business_type} />
-                    </Field>
+                {/* ── Jenis Bisnis ── */}
+                <Field className="space-y-1.5">
+                    <FieldLabel className="text-[13px] font-semibold text-neutral-800">
+                        Jenis Bisnis
+                    </FieldLabel>
+                    <InputGroup>
+                        <InputGroupAddon align="inline-start">
+                            <HugeiconsIcon icon={UserIcon} size={16} className="text-neutral-400 mr-2" />
+                        </InputGroupAddon>
+                        <Select
+                            value={bizData.business_type}
+                            onValueChange={(v) => setBizData('business_type', v)}
+                        >
+                            <SelectTrigger className={`${selectCls} w-full`}>
+                                <SelectValue placeholder="Pilih jenis bisnis..." />
+                            </SelectTrigger>
+                            <SelectContent position="popper" className="bg-white border border-neutral-100 shadow-lg">
+                                <SelectGroup>
+                                    <SelectLabel>Jenis Bisnis</SelectLabel>
+                                    {toOptions(businessTypes).map(({ value, label }) => (
+                                        <SelectItem key={value} value={value}>{label}</SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </InputGroup>
+                    <FieldError message={bizErrors.business_type} />
+                </Field>
 
-                    <Field className="space-y-1.5">
-                        <FieldLabel className="text-[13px] font-semibold text-neutral-800">
-                            Lokasi Bisnis
-                        </FieldLabel>
-                        <InputGroup>
-                            <InputGroupAddon align="inline-start">
-                                <HugeiconsIcon icon={Location01Icon} size={16} className="text-neutral-400 mr-2" />
-                            </InputGroupAddon>
-                            <Select
-                                value={bizData.location}
-                                onValueChange={(v) => setBizData('location', v)}
-                            >
-                                <SelectTrigger className={`${selectCls} w-full`}>
-                                    <SelectValue placeholder="Pilih kota..." />
-                                </SelectTrigger>
-                                <SelectContent position="popper" className="bg-white border border-neutral-100 shadow-lg">
-                                    <SelectGroup>
-                                        <SelectLabel>Lokasi</SelectLabel>
-                                        {toOptions(locations).map(({ value, label }) => (
-                                            <SelectItem key={value} value={value}>{label}</SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </InputGroup>
-                        <FieldError message={bizErrors.location} />
-                    </Field>
-                </div>
+                {/* ── Lokasi Bisnis ── */}
+                <Field className="space-y-1.5">
+                    <FieldLabel className="text-[13px] font-semibold text-neutral-800">
+                        Lokasi Bisnis
+                    </FieldLabel>
+                    <LocationPickerField
+                        value={bizData.location}
+                        onChange={(val) => setBizData('location', val)}
+                        error={bizErrors.location}
+                    />
+                </Field>
 
-                {/* Deskripsi */}
+                {/* ── Deskripsi ── */}
                 <Field className="space-y-1.5">
                     <FieldLabel htmlFor="description" className="text-[13px] font-semibold text-neutral-800">
                         Deskripsi Bisnis
@@ -248,7 +232,7 @@ export default function BusinessProfileForm({
                     <FieldError message={bizErrors.description} />
                 </Field>
 
-                {/* Target Audiens + Nuansa */}
+                {/* ── Target Audiens + Nuansa ── */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Field className="space-y-1.5">
                         <FieldLabel htmlFor="target_audience" className="text-[13px] font-semibold text-neutral-800">
@@ -298,10 +282,11 @@ export default function BusinessProfileForm({
                     </Field>
                 </div>
 
-                {/* Visi & Misi */}
+                {/* ── Visi & Misi ── */}
                 <Field className="space-y-1.5">
                     <FieldLabel htmlFor="vision_mission" className="text-[13px] font-semibold text-neutral-800">
-                        Visi &amp; Misi <span className="font-normal text-neutral-400">(opsional)</span>
+                        Visi &amp; Misi{' '}
+                        <span className="font-normal text-neutral-400">(opsional)</span>
                     </FieldLabel>
                     <Textarea
                         id="vision_mission"
@@ -314,10 +299,11 @@ export default function BusinessProfileForm({
                     <FieldError message={bizErrors.vision_mission} />
                 </Field>
 
-                {/* Keunikan */}
+                {/* ── Keunikan ── */}
                 <Field className="space-y-1.5">
                     <FieldLabel htmlFor="uniqueness" className="text-[13px] font-semibold text-neutral-800">
-                        Keunikan Bisnis <span className="font-normal text-neutral-400">(opsional)</span>
+                        Keunikan Bisnis{' '}
+                        <span className="font-normal text-neutral-400">(opsional)</span>
                     </FieldLabel>
                     <Textarea
                         id="uniqueness"
@@ -330,12 +316,12 @@ export default function BusinessProfileForm({
                     <FieldError message={bizErrors.uniqueness} />
                 </Field>
 
-                {/* Submit */}
+                {/* ── Submit ── */}
                 <div className="flex justify-end pt-2">
                     <Button
                         type="submit"
                         disabled={bizProcessing}
-                        className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="group cursor-pointer inline-flex items-center gap-1.5 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[13px] sm:text-[15px] px-4 sm:px-7 py-3 sm:py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                     >
                         {bizProcessing ? 'Menyimpan...' : 'Lanjut ke Data Produk'}
                         {!bizProcessing && (

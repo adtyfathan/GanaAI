@@ -301,7 +301,7 @@ function EditProductDialog({ product, productTypes, open, onClose, onUpdated }) 
                     <button
                         type="button"
                         onClick={onClose}
-                        className="text-[13px] font-semibold text-neutral-500 hover:text-neutral-800 transition-colors px-4 py-2"
+                        className="cursor-pointer text-[13px] font-semibold text-neutral-500 hover:text-neutral-800 transition-colors px-4 py-2"
                     >
                         Batal
                     </button>
@@ -309,7 +309,7 @@ function EditProductDialog({ product, productTypes, open, onClose, onUpdated }) 
                         type="button"
                         onClick={handleSubmit}
                         disabled={processing}
-                        className="h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[13px] px-5 py-2.5 rounded-lg shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                        className="h-auto cursor-pointer bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[13px] px-5 py-2.5 rounded-lg shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                     >
                         {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                     </Button>
@@ -384,7 +384,7 @@ function ProductCard({ product, onDelete, onEdit }) {
                 <h3 className="font-semibold text-neutral-900 text-[13px] mb-0.5 truncate">{product.name}</h3>
                 <p className="text-[12px] text-neutral-500 mb-2.5 line-clamp-1">{product.description}</p>
                 <div className="flex items-center justify-between">
-                    <span className="text-[13px] font-bold text-neutral-800">
+                    <span className="text-[12px] font-bold text-orange-500 font-mono">
                         Rp {parseInt(product.price).toLocaleString('id-ID')}
                     </span>
                     <span className="text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 border border-orange-100">
@@ -398,8 +398,7 @@ function ProductCard({ product, onDelete, onEdit }) {
 
 // ─── ProductForm (main export) ─────────────────────────────────────────────
 export default function ProductForm({
-    productTypes, products: initialProducts = [], productCount = 0,
-    businessSaved, onBack, onComplete, variants, direction,
+    productTypes, products: initialProducts = [], productCount = 0, onBack, onComplete, variants, direction,
 }) {
     const {
         data: prodData, setData: setProdData, post: postProd,
@@ -521,7 +520,7 @@ export default function ProductForm({
                     <button
                         type="button"
                         onClick={() => setShowProductForm(true)}
-                        className="w-full mb-6 flex items-center justify-center gap-2 border-2 border-dashed border-neutral-200 hover:border-orange-300 rounded-xl py-4 text-[13px] font-semibold text-neutral-500 hover:text-orange-600 transition-all duration-200 hover:bg-orange-50/40 group"
+                        className="w-full cursor-pointer mb-6 flex items-center justify-center gap-2 border-2 border-dashed border-neutral-200 hover:border-orange-300 rounded-xl py-4 text-[13px] font-semibold text-neutral-500 hover:text-orange-600 transition-all duration-200 hover:bg-orange-50/40 group"
                     >
                         <HugeiconsIcon icon={PlusSignIcon} size={16} className="transition-transform duration-200 group-hover:rotate-90" />
                         Tambah Produk {products.length > 0 ? 'Lagi' : 'Pertama'}
@@ -614,17 +613,19 @@ export default function ProductForm({
                 {/* Bottom navigation */}
                 {!showProductForm && (
                     <div className="pt-4 border-t border-neutral-100 flex items-center justify-between">
-                        <button type="button" onClick={onBack} className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
+                        <button type="button" onClick={onBack} className="group cursor-pointer inline-flex items-center gap-1.5 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[13px] sm:text-[15px] px-4 sm:px-7 py-3 sm:py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
                             <HugeiconsIcon icon={ArrowLeft01Icon} size={15} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
-                            Kembali ke Profil Bisnis
+                            <span class="hidden sm:inline">Kembali ke Profil Bisnis</span>
+                            <span class="sm:hidden">Kembali</span>
                         </button>
                         <Button
                             type="button"
                             disabled={products.length === 0}
                             onClick={handleComplete}
-                            className="group inline-flex items-center gap-2 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                            className="group cursor-pointer inline-flex items-center gap-1.5 h-auto bg-orange-500 hover:bg-orange-600 text-white font-jakarta font-bold text-[13px] sm:text-[15px] px-4 sm:px-7 py-3 sm:py-3.5 rounded-xl shadow-[0_4px_14px_rgba(249,115,22,0.28)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                         >
-                            Lanjut ke Media Sosial
+                            <span class="hidden sm:inline">Lanjut ke Media Sosial</span>
+                            <span class="sm:hidden">Lanjutkan</span>
                             <HugeiconsIcon icon={ArrowRight01Icon} size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
                         </Button>
                     </div>
