@@ -17,58 +17,54 @@ Route::get('/', function () {
 });
 
 // ── Onboarding (auth + verified users) ───────────────────────────────────────
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding.redirect'])
+    ->prefix('onboarding')
+    ->name('onboarding.')
+    ->group(function () {
 
-    // Single onboarding page (business profile + products + social connect)
-    Route::get('/onboarding', [OnboardingController::class, 'showOnboarding'])
-        ->name('onboarding.form');
+        // Single onboarding page (business profile + products + social connect)
+        Route::get('/', [OnboardingController::class, 'showOnboarding'])
+            ->name('form');
 
-    // Business profile
-    Route::post('/onboarding/bisnis', [OnboardingController::class, 'storeBusinessProfile'])
-        ->name('onboarding.business.store');
+        // Business profile
+        Route::post('/bisnis', [OnboardingController::class, 'storeBusinessProfile'])
+            ->name('business.store');
 
-    // Products
-    Route::post('/onboarding/produk', [OnboardingController::class, 'storeProduct'])
-        ->name('onboarding.product.store');
+        // Products
+        Route::prefix('produk')->name('product.')->group(function () {
+            Route::post('/', [OnboardingController::class, 'storeProduct'])
+                ->name('store');
+            Route::patch('/{product}', [OnboardingController::class, 'updateProduct'])
+                ->name('update');
+            Route::delete('/{product}', [OnboardingController::class, 'deleteProduct'])
+                ->name('delete');
+        });
 
-    Route::patch('/onboarding/produk/{product}', [OnboardingController::class, 'updateProduct'])
-        ->name('onboarding.product.update');
+        // ── Zernio OAuth — Social Media Connect (step 3 onboarding) ──────────
+        Route::prefix('zernio')->name('zernio.')->group(function () {
 
-    Route::delete('/onboarding/produk/{product}', [OnboardingController::class, 'deleteProduct'])
-        ->name('onboarding.product.delete');
+            // Buat Social Set di Zernio (dipanggil sekali saat masuk step 3)
+            Route::post('/social-set', [ZernioController::class, 'createSocialSet'])
+                ->name('social-set');
 
-    // ── Zernio OAuth — Social Media Connect (step 3 onboarding) ──────────────
+            // Dapatkan OAuth URL per platform
+            Route::post('/connect-url', [ZernioController::class, 'getConnectUrl'])
+                ->name('connect-url');
 
-    // Buat Social Set di Zernio (dipanggil sekali saat masuk step 3)
-    Route::post('/onboarding/zernio/social-set', [ZernioController::class, 'createSocialSet'])
-        ->name('onboarding.zernio.social-set');
+            // Sync accounts manual (tombol refresh di frontend)
+            Route::post('/sync', [ZernioController::class, 'syncAccounts'])
+                ->name('sync');
 
-    // Dapatkan OAuth URL per platform
-    Route::post('/onboarding/zernio/connect-url', [ZernioController::class, 'getConnectUrl'])
-        ->name('onboarding.zernio.connect-url');
-
-    // Callback dari Zernio setelah user authorize — GET karena Zernio redirect ke sini
-    Route::get('/onboarding/zernio/callback', [ZernioController::class, 'handleCallback'])
-        ->name('onboarding.zernio.callback');
-
-    // Sync accounts manual (tombol refresh di frontend)
-    Route::post('/onboarding/zernio/sync', [ZernioController::class, 'syncAccounts'])
-        ->name('onboarding.zernio.sync');
-
-    // Disconnect akun sosmed
-    Route::delete('/onboarding/zernio/accounts/{account}', [ZernioController::class, 'disconnectAccount'])
-        ->name('onboarding.zernio.disconnect');
-
-    // Show connect page (opsional, sebagai standalone page)
-    Route::get('/onboarding/connect', [ZernioController::class, 'showConnect'])
-        ->name('onboarding.connect');
-
-    // ─────────────────────────────────────────────────────────────────────────
-
-    // Final step — marks onboarding complete
-    Route::post('/onboarding/selesai', [OnboardingController::class, 'completeOnboarding'])
-        ->name('onboarding.complete');
-});
+            // Disconnect akun sosmed
+            Route::delete('/accounts/{account}', [ZernioController::class, 'disconnectAccount'])
+                ->name('disconnect');
+        });
+        // ─────────────────────────────────────────────────────────────────────
+    
+        // Final step — marks onboarding complete
+        Route::post('/selesai', [OnboardingController::class, 'completeOnboarding'])
+            ->name('complete');
+    });
 
 // ── Dashboard (requires completed onboarding) ─────────────────────────────────
 Route::get('/dashboard', function () {
@@ -76,10 +72,17 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified', 'onboarding.complete'])->name('dashboard');
 
 // ── Profile ───────────────────────────────────────────────────────────────────
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+Route::middleware('auth')
+    ->prefix('profile')
+    ->name('profile.')
+    ->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+    });
+
+Route::get('/onboarding/zernio/callback', [ZernioController::class, 'handleCallback'])
+    ->middleware(['auth', 'verified'])
+    ->name('onboarding.zernio.callback');
 
 require __DIR__ . '/auth.php';

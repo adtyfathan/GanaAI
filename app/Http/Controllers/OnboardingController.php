@@ -195,11 +195,13 @@ class OnboardingController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->hasCompletedOnboarding()) {
+        if (!$user->hasCompletedOnboardingForm()) {
             return response()->json([
                 'error' => 'Selesaikan setup bisnis, tambahkan minimal 1 produk, dan hubungkan minimal 1 akun sosial media.',
             ], 422);
         }
+
+        $user->update(['completed_onboarding' => true]);
 
         return redirect()->route('dashboard');
     }

@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'onboarding.complete' => \App\Http\Middleware\EnsureOnboardingComplete::class,
+            'onboarding.redirect' => \App\Http\Middleware\RedirectIfOnboardingComplete::class,
         ]);
 
         //

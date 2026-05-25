@@ -165,7 +165,7 @@ export default function Onboarding({
     const getInitialStep = () => {
         if (!businessProfile) return 1;
         if (initialProducts.length === 0) return 2;
-        if (connectedAccounts.length === 0) return 3;
+        if (connectedAccounts.length < 2) return 3;
         return 4;
     };
 

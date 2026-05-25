@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'completed_onboarding'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -58,12 +58,22 @@ class User extends Authenticatable
      */
     public function hasCompletedOnboarding(): bool
     {
-        return $this->businessProfile()->exists() && $this->products()->exists();
+        return (bool) $this->completed_onboarding
+            && $this->businessProfile()->exists()
+            && $this->products()->exists()
+            && $this->socialAccounts()->exists();
+    }
+
+    public function hasCompletedOnboardingForm(): bool
+    {
+        return (bool) $this->businessProfile()->exists()
+            && $this->products()->exists()
+            && $this->socialAccounts()->exists();
     }
 
     /**
      * Check if user has setup business profile.
-     */
+     */ 
     public function hasBusinessProfile(): bool
     {
         return $this->businessProfile()->exists();

@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BusinessProfile;
 use App\Models\SocialAccount;
 use App\Services\ZernioService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ZernioController extends Controller
@@ -139,23 +137,6 @@ class ZernioController extends Controller
         $account->delete();
 
         return response()->json(['success' => true]);
-    }
-
-    // ─── Show connect page ───────────────────────────────────────────────────
-
-    /**
-     * Render halaman step connect sosmed via Inertia.
-     * (Opsional — bisa dirender langsung dari Onboarding.jsx sebagai step 3)
-     */
-    public function showConnect(Request $request)
-    {
-        $user = $request->user();
-        $accounts = $user->socialAccounts()->get();
-
-        return Inertia::render('Onboarding/Onboarding', [
-            'connectedAccounts' => $accounts,
-            'socialSetId' => $user->businessProfile?->zernio_social_set_id,
-        ]);
     }
 
     // ─── Internal helper ─────────────────────────────────────────────────────
