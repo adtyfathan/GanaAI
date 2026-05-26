@@ -124,3 +124,7 @@
   background: white !important;
   backdrop-filter: none !important;
 }
+
+[data-slot="dialog-overlay"] {
+  background: transparent !important;
+}

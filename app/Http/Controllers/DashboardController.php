@@ -24,7 +24,7 @@ class DashboardController extends Controller
         // Ambil semua content_ideas bulan ini + post_schedules-nya
         $contentIdeas = ContentIdea::with([
             'postSchedules.socialAccount',
-            'product',
+            'product.images',
             'generatedContent',
         ])
             ->where('user_id', $user->id)
@@ -43,6 +43,10 @@ class DashboardController extends Controller
                 'product' => $idea->product ? [
                     'id' => $idea->product->id,
                     'name' => $idea->product->name,
+                    'images' => $idea->product->images->map(fn($img) => [
+                        'image_path' => $img->image_path,
+                        'sort_order' => $img->sort_order,
+                    ])->sortBy('sort_order')->values(),
                 ] : null,
                 'post_schedules' => $idea->postSchedules->map(fn($s) => [
                     'id' => $s->id,
