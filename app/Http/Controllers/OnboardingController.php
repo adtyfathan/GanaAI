@@ -9,6 +9,7 @@ use App\Http\Requests\StoreBusinessProfileRequest;
 use App\Http\Requests\StoreProductRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Jobs\GenerateScheduleJob;
 
 class OnboardingController extends Controller
 {
@@ -202,6 +203,10 @@ class OnboardingController extends Controller
         }
 
         $user->update(['completed_onboarding' => true]);
+
+        // Dispatch job generate jadwal secara async
+        // Job berjalan di background — user langsung diarahkan ke dashboard
+        GenerateScheduleJob::dispatch($user);
 
         return redirect()->route('dashboard');
     }

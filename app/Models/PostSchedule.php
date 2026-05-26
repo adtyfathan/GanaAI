@@ -16,6 +16,7 @@ class PostSchedule extends Model
         'generated_content_id',
         'user_id',
         'social_account_id',
+        'post_type',
         'scheduled_at',
         'status',
         'zernio_post_id',

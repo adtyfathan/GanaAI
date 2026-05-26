@@ -118,3 +118,9 @@
     font-family: var(--font-sans);
   }
 }
+
+[data-radix-dialog-overlay],
+[data-slot="sheet-overlay"] {
+  background: white !important;
+  backdrop-filter: none !important;
+}

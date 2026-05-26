@@ -16,6 +16,7 @@ class ContentIdea extends Model
         'user_id',
         'product_id',
         'content_theme',
+        'content_description',
         'content_type',
         'holiday_name',
         'generation_month',

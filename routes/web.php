@@ -3,6 +3,7 @@
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ZernioController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -67,9 +68,9 @@ Route::middleware(['auth', 'verified', 'onboarding.redirect'])
     });
 
 // ── Dashboard (requires completed onboarding) ─────────────────────────────────
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified', 'onboarding.complete'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'onboarding.complete'])
+    ->name('dashboard');
 
 // ── Profile ───────────────────────────────────────────────────────────────────
 Route::middleware('auth')
